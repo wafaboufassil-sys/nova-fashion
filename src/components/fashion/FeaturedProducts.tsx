@@ -1,10 +1,10 @@
 'use client';
 
 import { motion, useInView } from 'framer-motion';
-import { useRef, useState } from 'react';
+import { useRef, useState, useCallback } from 'react';
 import { ShoppingBag, Heart } from 'lucide-react';
+import Image from 'next/image';
 import type { CartItem } from './Navbar';
-import GlowButton from './GlowButton';
 
 const products = [
   {
@@ -12,36 +12,40 @@ const products = [
     name: 'Phantom Runner X1',
     price: 349,
     category: 'Sneakers',
-    gradient: 'linear-gradient(135deg, #001020 0%, #00d4ff 60%, #2d1b69 100%)',
+    image: '/product-phantom-runner.png',
     tag: 'NEW',
     sizes: ['US 8', 'US 9', 'US 10', 'US 11', 'US 12'],
+    accent: '#00d4ff',
   },
   {
     id: 2,
     name: 'Shadow Tech Hoodie',
     price: 289,
     category: 'Hoodies',
-    gradient: 'linear-gradient(135deg, #0a0020 0%, #ff00ff 50%, #1a0030 100%)',
+    image: '/product-shadow-hoodie.png',
     tag: 'BESTSELLER',
     sizes: ['S', 'M', 'L', 'XL', 'XXL'],
+    accent: '#ff00ff',
   },
   {
     id: 3,
     name: 'Neon Flux Jacket',
     price: 459,
     category: 'Jackets',
-    gradient: 'linear-gradient(135deg, #000020 0%, #0ea5e9 40%, #ff00ff 100%)',
+    image: '/product-neon-jacket.png',
     tag: 'TRENDING',
     sizes: ['S', 'M', 'L', 'XL'],
+    accent: '#0ea5e9',
   },
   {
     id: 4,
     name: 'Void Series Drop 01',
     price: 599,
     category: 'Limited Edition',
-    gradient: 'linear-gradient(135deg, #1a0030 0%, #ff00ff 30%, #00d4ff 70%, #000 100%)',
+    image: '/product-void-series.png',
     tag: 'LIMITED',
     sizes: ['S', 'M', 'L'],
+    accent: '#ff00ff',
   },
 ];
 
@@ -66,7 +70,7 @@ export default function FeaturedProducts({ cartItems, setCartItems }: FeaturedPr
         id: product.id,
         name: product.name,
         price: product.price,
-        image: product.gradient,
+        image: product.image,
         size: product.sizes[2] || product.sizes[0],
         quantity: 1,
       }];
@@ -145,6 +149,21 @@ function ProductCard({
 }) {
   const [isHovered, setIsHovered] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width - 0.5) * 12;
+    const y = ((e.clientY - rect.top) / rect.height - 0.5) * 12;
+    cardRef.current.style.transform = `perspective(1000px) rotateY(${x}deg) rotateX(${-y}deg)`;
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    if (cardRef.current) {
+      cardRef.current.style.transform = 'perspective(1000px) rotateY(0deg) rotateX(0deg)';
+    }
+  }, []);
 
   const tagColors: Record<string, string> = {
     NEW: 'bg-[#00d4ff] text-black',
@@ -159,37 +178,75 @@ function ProductCard({
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
       animate={{
-        y: [0, -8, 0],
+        y: [0, -5, 0],
       }}
       transition={{
-        y: { duration: 4 + Math.random() * 2, repeat: Infinity, ease: 'easeInOut' },
+        y: { duration: 5 + Math.random() * 2, repeat: Infinity, ease: 'easeInOut' },
       }}
     >
-      <div className="relative overflow-hidden rounded-xl border border-white/5 bg-[rgba(255,255,255,0.03)] transition-all duration-500"
+      <div
+        ref={cardRef}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        className="relative overflow-hidden rounded-xl border border-white/5 bg-[rgba(255,255,255,0.03)] transition-shadow duration-500 preserve-3d"
         style={{
           boxShadow: isHovered
-            ? '0 0 30px rgba(0, 212, 255, 0.15), 0 0 60px rgba(255, 0, 255, 0.05)'
-            : 'none',
+            ? `0 0 30px rgba(0, 212, 255, 0.15), 0 0 60px rgba(255, 0, 255, 0.05), 0 25px 50px rgba(0,0,0,0.4)`
+            : '0 4px 12px rgba(0,0,0,0.2)',
+          willChange: 'transform',
         }}
       >
+        {/* 3D Glow ring behind product */}
+        <div className="pointer-events-none absolute inset-0 z-0">
+          <div
+            className="absolute left-1/2 top-1/2 h-[80%] w-[80%] -translate-x-1/2 -translate-y-1/2 rounded-full glow-ring transition-opacity duration-500"
+            style={{
+              borderColor: `${product.accent}20`,
+              border: `1px solid ${product.accent}20`,
+              opacity: isHovered ? 1 : 0.3,
+            }}
+          />
+        </div>
+
         {/* Image area */}
         <div className="relative aspect-square overflow-hidden">
-          <div
-            className="absolute inset-0 transition-transform duration-700 group-hover:scale-110"
-            style={{ background: product.gradient }}
+          {/* Product Image with parallax depth */}
+          <motion.div
+            className="absolute inset-0 transition-transform duration-700"
+            animate={{
+              scale: isHovered ? 1.08 : 1,
+              y: isHovered ? -5 : 0,
+            }}
+            transition={{ duration: 0.5, ease: 'easeOut' }}
           >
-            {/* Geometric pattern overlay */}
-            <div className="absolute inset-0 opacity-20"
-              style={{
-                backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 20px, rgba(255,255,255,0.05) 20px, rgba(255,255,255,0.05) 40px)',
-              }}
+            <Image
+              src={product.image}
+              alt={product.name}
+              fill
+              className="object-cover"
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
             />
-          </div>
+          </motion.div>
 
-          {/* Tag */}
+          {/* Holographic shimmer overlay */}
+          <div className="pointer-events-none absolute inset-0 z-[5] opacity-0 transition-opacity duration-500 group-hover:opacity-100 holographic-shimmer" />
+
+          {/* 3D Tag badge with ribbon effect */}
           <div className="absolute left-3 top-3 z-10">
-            <span className={`rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider ${tagColors[product.tag]}`}>
+            <span
+              className={`relative rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider ${tagColors[product.tag]}`}
+              style={{
+                transform: 'translateZ(30px)',
+              }}
+            >
               {product.tag}
+              {/* Ribbon tail */}
+              <span
+                className="absolute -bottom-1 left-1/2 h-2 w-2 -translate-x-1/2 rotate-45"
+                style={{
+                  backgroundColor: product.tag === 'NEW' ? '#00d4ff' : product.tag === 'BESTSELLER' ? '#ff00ff' : product.tag === 'TRENDING' ? '#ec4899' : '#00d4ff',
+                }}
+              />
             </span>
           </div>
 
@@ -224,6 +281,11 @@ function ProductCard({
               Add to Cart
             </motion.button>
           </motion.div>
+        </div>
+
+        {/* Reflective floor effect */}
+        <div className="relative h-12 overflow-hidden">
+          <div className="absolute inset-0 reflective-floor opacity-40" />
         </div>
 
         {/* Product info */}

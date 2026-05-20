@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { X, Plus, Minus, ShoppingBag } from 'lucide-react';
+import Image from 'next/image';
 import type { CartItem } from './Navbar';
 
 interface CartDrawerProps {
@@ -69,10 +70,15 @@ export default function CartDrawer({ isOpen, setIsOpen, cartItems, setCartItems 
                 transition={{ delay: index * 0.05 }}
                 className="glass flex gap-4 p-3"
               >
-                <div
-                  className="h-20 w-20 flex-shrink-0 rounded-lg"
-                  style={{ background: item.image }}
-                />
+                <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg">
+                  <Image
+                    src={item.image}
+                    alt={item.name}
+                    fill
+                    className="object-cover"
+                    sizes="80px"
+                  />
+                </div>
                 <div className="flex flex-1 flex-col justify-between">
                   <div>
                     <h3 className="text-sm font-medium">{item.name}</h3>

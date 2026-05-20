@@ -342,6 +342,120 @@
   background: linear-gradient(180deg, rgba(255, 0, 255, 0.2) 0%, rgba(0, 212, 255, 0.1) 50%, rgba(26, 0, 48, 0.9) 100%);
 }
 
+/* 3D Animation Keyframes */
+@keyframes orbit-3d {
+  0% { transform: rotateX(70deg) rotateZ(0deg); }
+  100% { transform: rotateX(70deg) rotateZ(360deg); }
+}
+
+@keyframes float-3d {
+  0%, 100% { transform: translateY(0) rotateX(0) rotateY(0); }
+  25% { transform: translateY(-10px) rotateX(5deg) rotateY(5deg); }
+  50% { transform: translateY(-20px) rotateX(0) rotateY(0); }
+  75% { transform: translateY(-10px) rotateX(-5deg) rotateY(-5deg); }
+}
+
+@keyframes holographic {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes depth-pulse {
+  0%, 100% { transform: scale(1) translateZ(0); }
+  50% { transform: scale(1.05) translateZ(20px); }
+}
+
+@keyframes light-streak {
+  0% { transform: translateX(-100%) rotate(45deg); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translateX(200%) rotate(45deg); opacity: 0; }
+}
+
+@keyframes rotate-ring {
+  from { transform: rotateX(75deg) rotateZ(0deg); }
+  to { transform: rotateX(75deg) rotateZ(360deg); }
+}
+
+@keyframes shimmer-follow {
+  0% { transform: translateX(-100%) translateY(-100%); }
+  100% { transform: translateX(100%) translateY(100%); }
+}
+
+@keyframes glow-ring-pulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(0, 212, 255, 0.15), 0 0 40px rgba(0, 212, 255, 0.05); }
+  50% { box-shadow: 0 0 40px rgba(0, 212, 255, 0.3), 0 0 80px rgba(0, 212, 255, 0.1), 0 0 120px rgba(255, 0, 255, 0.05); }
+}
+
+@keyframes volumetric-light {
+  0% { opacity: 0.03; transform: rotate(0deg) scale(1); }
+  50% { opacity: 0.06; transform: rotate(180deg) scale(1.1); }
+  100% { opacity: 0.03; transform: rotate(360deg) scale(1); }
+}
+
+/* 3D utility classes */
+.perspective-1000 { perspective: 1000px; }
+.perspective-1500 { perspective: 1500px; }
+.preserve-3d { transform-style: preserve-3d; }
+.backface-hidden { backface-visibility: hidden; }
+
+/* Holographic shimmer overlay */
+.holographic-shimmer {
+  background: linear-gradient(
+    105deg,
+    transparent 20%,
+    rgba(0, 212, 255, 0.1) 30%,
+    rgba(255, 0, 255, 0.15) 40%,
+    rgba(0, 212, 255, 0.1) 50%,
+    transparent 60%
+  );
+  background-size: 200% 100%;
+  animation: holographic 3s ease infinite;
+}
+
+/* 3D reflective floor */
+.reflective-floor {
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 212, 255, 0.1) 0%,
+    transparent 100%
+  );
+  filter: blur(2px);
+  transform: scaleY(-1);
+  mask-image: linear-gradient(to bottom, rgba(0,0,0,0.3), transparent 50%);
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0.3), transparent 50%);
+}
+
+/* Light streak effect */
+.light-streak::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 30%;
+  height: 200%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+  animation: light-streak 4s ease-in-out infinite;
+}
+
+/* 3D orbital ring */
+.orbital-ring {
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  border-radius: 50%;
+  animation: rotate-ring 10s linear infinite;
+}
+
+/* 3D card lift */
+.card-lift {
+  will-change: transform;
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.4s ease;
+}
+
+/* Glow ring pulse */
+.glow-ring {
+  animation: glow-ring-pulse 3s ease-in-out infinite;
+}
+
 /* Hide scrollbar utility */
 .scrollbar-hide {
   -ms-overflow-style: none;
